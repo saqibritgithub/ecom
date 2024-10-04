@@ -1,0 +1,26 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+    <h1>Your Cart</h1>
+    
+    <!-- Display products in the cart -->
+    <ul>
+        {% for product in products %}
+            <li>
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:150px;height:auto;">
+                <p>{{ product.name }} - ${{ product.price }}</p>
+            </li>
+        {% empty %}
+            <li>Your cart is empty.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Display the total bill if there are products in the cart -->
+    {% if products %}
+        <h2>Total Bill: ${{ total_bill }}</h2>
+        
+    {% endif %}
+
+    <!-- Provide a link to continue shopping -->
+    <a href="{% url 'home' %}">Continue Shopping</a>
+{% endblock %}
