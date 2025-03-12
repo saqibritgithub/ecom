@@ -1,8 +1,8 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Category, Product, Cart, Review, Order
-from .serializers import CategorySerializer, ProductSerializer, CartSerializer, ReviewSerializer, OrderSerializer, LoginSerializer, UserSerializer
+from .models import Category, Product, Cart, Review, Order,Job
+from .serializers import CategorySerializer, ProductSerializer, CartSerializer, ReviewSerializer, OrderSerializer, LoginSerializer, UserSerializer,JobSerializer,GroupSerializer,IdSerializer
 from rest_framework.views import APIView
 from django.http import Http404
 from rest_framework import generics
@@ -12,6 +12,7 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from django.http import HttpResponse
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.db.models import  Count
 
 
 def api_root(request):
@@ -22,10 +23,12 @@ def api_root(request):
         "Orders: /api/orders/",
         "Cart: /api/cart/",
         "Reviews: /api/reviews/",
-        "Register: /api/register/",
+        "Register: /api/signup/",
         "Login: /api/login/",
         "Logout: /api/logout/",
-    ]
+        "Jobs : /api/jobs/",
+        "Grouped: /api/grouped-jobs/" 
+        ]
     
     
     response_text = "\n".join(api_endpoints)
@@ -282,3 +285,54 @@ class LoginAPI(APIView):
             "status": False,
             "errors": serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+    
+class JobListAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        jobs = Job.objects.all()
+        serializer = JobSerializer(jobs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class JobDetailAPIView(APIView):
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            job = Job.objects.get(pk=pk)
+            serializer = JobSerializer(job)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Job.DoesNotExist:
+            return Response({"error": "Job not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class GroupApiView(APIView):
+    def get(self, request):
+        grouped_jobs = Job.objects.values('title', 'company', 'job_type', 'location')
+        result = []
+        for group in grouped_jobs:
+            jobs_in_group = Job.objects.filter(
+                title=group['title'],
+                company=group['company'],
+                job_type=group['job_type'],
+                location=group['location']
+            )
+            
+            serialized_jobs = GroupSerializer(jobs_in_group, many=True).data
+            result.append({
+                'title': group['title'],
+                'company': group['company'],
+                'job_type': group['job_type'],
+                'location': group['location'],
+                'jobs': serialized_jobs
+            })
+
+        return Response(result)
+    
+
+class JobByJobIdView(APIView):
+    def get(self, request, job_id):
+        jobs = Job.objects.filter(job_id=job_id)
+        
+        if jobs.exists():
+            serializer = IdSerializer(jobs, many=True)  
+            return Response(serializer.data)
+        else:
+            return Response({"message": "No jobs found with this job ID."}, status=404)

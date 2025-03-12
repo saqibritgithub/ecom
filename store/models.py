@@ -54,14 +54,15 @@ class Order(models.Model):
 from django.db import models
 
 class Job(models.Model):
+    job_id = models.IntegerField(unique=True,null=True)
     title = models.CharField(max_length=255)
     company = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     job_type = models.CharField(max_length=255)
-    date_posted = models.DateField()
-    #catagory = models.CharField(max_length=255, null=True, blank=True)  # Optional field for job category
+    date_posted = models.DateField(null=True,blank=True)
     lead_date = models.DateField(null=True, blank=True)
     platform = models.CharField(max_length=255, null=True, blank=True)
+    salary = models.CharField(max_length=255,null=True)
     lead_url = models.URLField(null=True, blank=True)
     company_url = models.URLField(null=True, blank=True)
     posted_date = models.DateField(null=True, blank=True)
@@ -78,3 +79,5 @@ class Job(models.Model):
 
     def __str__(self):
         return self.title
+    
+

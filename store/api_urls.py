@@ -1,14 +1,10 @@
 from django.urls import path
 from . import api_views
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from rest_framework_simplejwt.views import TokenRefreshView
 
 
 urlpatterns = [
     path('', api_views.api_root, name='api-root'),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     # Category URLs (Function-based views)
@@ -26,7 +22,8 @@ urlpatterns = [
     # Product URLs (Class-based views)
     path('products/', api_views.ProductList.as_view(), name='product-list'),
     path('products/<int:pk>/', api_views.ProductDetail.as_view(), name='product-detail'),
-
+    path('grouped-jobs/', api_views.GroupApiView.as_view(), name='grouped-jobs'),
+    path('jobs-by-id/<int:job_id>/', api_views.JobByJobIdView.as_view(), name='jobs-by-id'),
     # Cart URLs (Class-based views)
     path('carts/', api_views.CartList.as_view(), name='cart-list'),
     path('carts/<int:pk>/', api_views.CartDetail.as_view(), name='cart-detail'),
@@ -38,4 +35,9 @@ urlpatterns = [
     # Order URLs (Generic views)
     path('orders/', api_views.OrderList.as_view(), name='order-list'),
     path('orders/<int:pk>/', api_views.OrderDetail.as_view(), name='order-detail'),
+    
+    path('jobs/', api_views.JobListAPIView.as_view(), name='job-list'),
+    path('jobs/<int:pk>/', api_views.JobDetailAPIView.as_view(), name='job-detail'),
+
+
 ]

@@ -27,3 +27,4 @@ admin.site.register(Order)
 admin.site.register(Cart)
 admin.site.register(Job)
 
+

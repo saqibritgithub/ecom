@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, Cart, Review, Order
+from .models import Category, Product, Cart, Review, Order, Job
 from django.contrib.auth.models import User
 
 class CategorySerializer(serializers.Serializer):
@@ -115,3 +115,48 @@ class UserSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+
+class JobSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    title = serializers.CharField(max_length=255)
+    company = serializers.CharField(max_length=255)
+    location = serializers.CharField(max_length=255)
+    job_type = serializers.CharField(max_length=255)
+    date_posted = serializers.DateField()
+    # lead_date = serializers.DateField(allow_null=True, required=False)
+    # platform = serializers.CharField(max_length=255, allow_null=True, required=False)
+    # lead_url = serializers.URLField(allow_null=True, required=False)
+    # company_url = serializers.URLField(allow_null=True, required=False)
+    # posted_date = serializers.DateField(allow_null=True, required=False)
+    # region = serializers.CharField(max_length=255, allow_null=True, required=False)
+    # industry = serializers.CharField(max_length=255, allow_null=True, required=False)
+    # job_fetch_timestamp = serializers.DateTimeField(read_only=True)
+    # validated = serializers.BooleanField(default=False)
+    # company_url_validated = serializers.BooleanField(default=False)
+    # already_exist_validated = serializers.BooleanField(default=False)
+    # invalid_title_validated = serializers.BooleanField(default=False)
+    # email_validated = serializers.EmailField(allow_null=True, required=False)
+    # validated_date = serializers.DateField(allow_null=True, required=False)
+    # posted_date_formatted = serializers.CharField(max_length=255, allow_null=True, required=False)
+
+    def create(self, validated_data):
+        return Job.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+ 
+class GroupSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=255)
+    company = serializers.CharField(max_length=255)
+    location = serializers.CharField(max_length=255)
+    job_type = serializers.CharField(max_length=255)
+
+class IdSerializer(serializers.Serializer):
+    job_id = serializers.IntegerField()
+    title = serializers.CharField(max_length=255)
+    company = serializers.CharField(max_length=255)
+    location = serializers.CharField(max_length=255)
+    job_type = serializers.CharField(max_length=255)
